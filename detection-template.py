@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 from os import listdir
 from os.path import isfile, join
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
+from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 import argparse
@@ -73,6 +74,7 @@ def split_dataset(dataset):
 def train_classifier(X, y):
     print("Training classifier")
     clf = RandomForestClassifier(n_estimators = 50)
+    #clf.fit_transform(X, y)
     clf.fit_transform(X, y)
     print("Done")
     return clf
@@ -141,7 +143,7 @@ else:
     print 'Testing the previous trained model on an testing dataset'
     print 'Loading model from disk...'
     try:
-        clf = pickle.load( open( "./dos-santos-model.pickle", "rb" ))
+        clf = pickle.load( open( "./trained-model.pickle", "rb" ))
     except IOError:
         print 'No model stored yet on disk. Please first train with a training dataset.'
         sys.exit(-1)
