@@ -3,8 +3,12 @@ import numpy as np
 import pandas as pd
 from os import listdir
 from os.path import isfile, join
-#from sklearn.model_selection import train_test_split
-from sklearn.cross_validation import train_test_split
+try:
+    # For linux use model_selection
+    from sklearn.model_selection import train_test_split
+except ImportError:
+    # For MACOS use cross_validation, since model_selection is not in the repos yet
+    from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 import argparse
