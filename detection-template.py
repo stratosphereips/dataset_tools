@@ -9,74 +9,73 @@ import pickle
 import argparse
 import sys
 
-def create_dataset_folder(path):
-    datafiles = [filename for filename in listdir(path) if isfile(join(path, filename)) and not filename.startswith(".")]
-
+def read_dataset_folder(path):
+    """
+    Gets a path folder, reads all the binetflow files on it and creates a panda dataset
+    Just in case, the files name have to end with '*flow'
+    """
+    datafiles = [filename for filename in listdir(path) if isfile(join(path, filename)) and not filename.startswith(".") and filename.endswith('flow')]
     datasets = []
     for filename in datafiles:
         print("Loading " + filename + "...")
         dataset = pd.read_csv(join(path, filename), parse_dates=["StartTime"])
+        # This is controversial
         dataset = dataset.set_index(dataset.StartTime)
         datasets.append(dataset)
         print("Done")
-
     return pd.concat(datasets)
 
-def create_dataset(path):
-    dataset = pd.read_csv(path, parse_dates=["StartTime"])
-    dataset = dataset.set_index(dataset.StartTime)
-    return dataset
-
-# ---------------- feature extraction -------------------
-
-def calculate_flow_statistics(dataset):
-    # for index, row in dataset.iterrows():
-    print("Calculating flow statistics....")
-
-def make_category(dataset, cat):
+def make_categorical(dataset, cat):
+    """
+    ???
+    """
     dataset[cat] = pd.Categorical(dataset[cat])
     dataset[cat] = dataset[cat].cat.codes
     return dataset
 
-def extract_features(dataset):
-    print("Extracting features...")
-
-    calculate_flow_statistics(dataset)
-
+def process_features(dataset):
+    """ 
+    Discards some features of the dataset and can create new.
+    """
+    print("Processing features...")
+    print('\tDiscarding column {}'.format('StartTime'))
     dataset = dataset.drop(["StartTime"], axis=1)
+    #????
     dataset.reset_index()
+    print('\tDiscarding column {}'.format('SrcAddr'))
     dataset = dataset.drop(["SrcAddr"], axis=1)
+    print('\tDiscarding column {}'.format('DstAddr'))
     dataset = dataset.drop(["DstAddr"], axis=1)
+    print('\tDiscarding column {}'.format('sTos'))
     dataset = dataset.drop(["sTos"], axis=1)
+    print('\tDiscarding column {}'.format('dTos'))
     dataset = dataset.drop(["dTos"], axis=1)
-
-    dataset = make_category(dataset, "Dir")
-    dataset = make_category(dataset, "Proto")
-    dataset = make_category(dataset, "Sport")
-    dataset = make_category(dataset, "State")
-    dataset = make_category(dataset, "Dport")
+    # Create categorical features
+    dataset = make_categorical(dataset, "Dir")
+    dataset = make_categorical(dataset, "Proto")
+    # ???
+    dataset = make_categorical(dataset, "Sport")
+    dataset = make_categorical(dataset, "State")
+    # ???
+    dataset = make_categorical(dataset, "Dport")
     print("Done")
     return dataset
 
-# ----------------- data selection ----------------------
-
 def split_dataset(dataset):
+    """
+    Separates the dataset in training data, training labels, testing data and testing labels. (Testing is cross-validation during training)
+    """
     y = dataset["Label"]
     X = dataset.drop(["Label"], axis=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     return X_train, X_test, y_train, y_test
 
-# ----------------- training ---------------------------
-
 def train_classifier(X, y):
     print("Training classifier")
-
     clf = RandomForestClassifier(n_estimators = 50)
     clf.fit_transform(X, y)
     print("Done")
     return clf
-
-# ----------------- testing ---------------------------
 
 def test_classifier(clf, X, y):
     print("Testing classifier")
@@ -121,10 +120,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 # Loads binetflow files from the folder as training dataset
-dataset = create_dataset_folder(args.data)
+dataset = read_dataset_folder(args.data)
 
-# Extract features
-dataset = extract_features(dataset)
+# Process features
+dataset = process_features(dataset)
 
 # Are we training?
 if args.training:
