@@ -17,9 +17,9 @@ from sklearn.neighbors import KNeighborsClassifier
 # from sklearn.neighbors import KNeighborsClassifier
 # from sklearn.svm import SVC
 # from sklearn.gaussian_process import GaussianProcessClassifier
-# from sklearn.gaussian_process.kernels import RBF
+from sklearn.gaussian_process.kernels import RBF
 # from sklearn.tree import DecisionTreeClassifier
-# from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 # from sklearn.naive_bayes import GaussianNB
 # from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 import pickle
@@ -118,7 +118,7 @@ def test_classifier(clf, X, y):
         if (pred == 'Malware' and result == 'Normal'):
             FP += 1
     # Compute and output the performance metrics. The last parameter is the name of the algor to store in the file
-    compute_total_performance_metrics(TP, TN, FP, FN, str(type(clf)))
+    compute_total_performance_metrics(TP, TN, FP, FN, str(type(clf)).split('\'')[1].split('.')[-1] )
     dataset = X
     dataset['Label'] = y
     dataset['Prediction'] = results
@@ -234,6 +234,9 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--debug', help='Amount of debugging. This shows inner information about the flows.', action='store', required=False, type=int)
     parser.add_argument('-t', '--training', help='Use the dataset stored in the folder Dataset for training, else use it for testing. You should first train something to store the model on disk.', action='store_true', required=False)
     parser.add_argument('-d', '--data', help='Use the dataset stored in this folder. The format is csv with the last column named \'Label\'.', action='store', required=True)
+    parser.add_argument('-f', '--storeflows', help='Also create an output file with the original binetflows with a new column for the prediction.', action='store_true', required=False, default=False)
+    parser.add_argument('-m', '--modelfilename', help='Name of the file where the model will be stored during training and read during testing.', action='store', required=False, type=str)
+
     args = parser.parse_args()
 
 # Output file name
@@ -255,13 +258,22 @@ if args.training:
 
     # Store the model on disk
     print 'Storing the model on disk'
-    pickle.dump(clf, open( './trained-model.pickle', 'wb' ) )
+    if args.modelfilename:
+        pickle.dump(clf, open( args.modelfilename, 'wb' ) )
+    else:
+        print 'No model file name provided, using the name of the classifier.'
+        pickle.dump(clf, open( str(type(clf)).split('\'')[1].split('.')[-1]  + '-trained-model.pickle', 'wb' ) )
 else:
     # Are we testing?
     print 'Testing the previous trained model on an testing dataset'
     print 'Loading model from disk...'
     try:
-        clf = pickle.load( open( './trained-model.pickle', 'rb' ))
+        #clf = pickle.load( open( './trained-model.pickle', 'rb' ))
+        if args.modelfilename:
+            clf = pickle.load( open( args.modelfilename, 'rb' ) )
+        else:
+            print 'No model file name provided. Please provide one.'
+            sys.exit(-1)
     except IOError:
         print 'No model stored yet on disk. Please first train with a training dataset.'
         sys.exit(-1)
@@ -274,4 +286,5 @@ else:
     dataset = test_classifier(clf, X, y)
 
     # Writes the classified dataset to disk
-    dataset.to_csv(outputfilename + '.binetflow')
+    if args.storeflows:
+        dataset.to_csv(outputfilename + '.binetflow')
