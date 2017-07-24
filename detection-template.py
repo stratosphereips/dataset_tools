@@ -117,14 +117,14 @@ def test_classifier(clf, X, y):
             TP += 1
         if (pred == 'Malware' and result == 'Normal'):
             FP += 1
-    # Compute and output the performance metrics
-    compute_total_performance_metrics(TP, TN, FP, FN)
+    # Compute and output the performance metrics. The last parameter is the name of the algor to store in the file
+    compute_total_performance_metrics(TP, TN, FP, FN, str(type(clf)))
     dataset = X
     dataset['Label'] = y
     dataset['Prediction'] = results
     return dataset
 
-def compute_total_performance_metrics(TP, TN, FP, FN):
+def compute_total_performance_metrics(TP, TN, FP, FN, algor_name):
     """ 
     Compute the performance metrics 
     """
@@ -150,11 +150,11 @@ def compute_total_performance_metrics(TP, TN, FP, FN):
     except ZeroDivisionError:
         Precision = -1
     try:
-        Accuracy = TP + TN / float(TP + TN + FP + FN)
+        Accuracy = float(TP + TN) / float(TP + TN + FP + FN)
     except ZeroDivisionError:
         Accuracy = -1
     try:
-        ErrorRate = FN + FP / float(TP + TN + FP + FN)
+        ErrorRate = float(FN + FP) / float(TP + TN + FP + FN)
     except ZeroDivisionError:
         ErrorRate = -1
     # With beta=1 F-Measure is also Fscore and the balance is equal. beta=0.5 gives weights recall lower (FN less important)
@@ -186,40 +186,44 @@ def compute_total_performance_metrics(TP, TN, FP, FN):
         DOR = -1
 
     f = open(outputfilename + '.metrics', 'w')
+    print('Algorithm for training and testing: {}'.format(algor_name))
+    f.write('Algorithm for training and testing: {}\n'.format(algor_name))
+    print('Testing Dataset: {}'.format(args.data))
+    f.write('Testing Dataset: {}\n'.format(args.data))
     print('TP = {}'.format(TP))
-    f.write('TP = {}'.format(TP) + '\n')
+    f.write('TP = {}\n'.format(TP))
     print('FP = {}'.format(FP))
-    f.write('FP = {}'.format(FP) + '\n')
+    f.write('FP = {}\n'.format(FP))
     print('TN = {}'.format(TN))
-    f.write('TN = {}'.format(TN) + '\n')
+    f.write('TN = {}\n'.format(TN))
     print('FN = {}'.format(FN))
-    f.write('FN = {}'.format(FN) + '\n')
+    f.write('FN = {}\n'.format(FN))
     print('TPR (Recall) = {}'.format(TPR))
-    f.write('TPR (Recall) = {}'.format(TPR) + '\n')
+    f.write('TPR (Recall) = {}\n'.format(TPR))
     print('TNR = {}'.format(TNR))
-    f.write('TNR = {}'.format(TNR) + '\n')
+    f.write('TNR = {}\n'.format(TNR))
     print('FNR = {}'.format(FNR))
-    f.write('FNR = {}'.format(FNR) + '\n')
+    f.write('FNR = {}\n'.format(FNR))
     print('FPR = {}'.format(FPR))
-    f.write('FPR = {}'.format(FPR) + '\n')
+    f.write('FPR = {}\n'.format(FPR))
     print('Precision (Positive Prediction Value)= {}'.format(Precision))
-    f.write('Precision (Positive Prediction Value)= {}'.format(Precision) + '\n')
+    f.write('Precision (Positive Prediction Value)= {}\n'.format(Precision))
     print('Accuracy = {}'.format(Accuracy))
-    f.write('Accuracy = {}'.format(Accuracy) + '\n')
+    f.write('Accuracy = {}\n'.format(Accuracy))
     print('ErrorRate = {}'.format(ErrorRate))
-    f.write('ErrorRate = {}'.format(ErrorRate) + '\n')
+    f.write('ErrorRate = {}\n'.format(ErrorRate))
     print('False Discovery Rate = {}'.format(FDR))
-    f.write('False Discovery Rate = {}'.format(FDR) + '\n')
+    f.write('False Discovery Rate = {}\n'.format(FDR))
     print('Negative Predictive Value = {}'.format(NPV))
-    f.write('Negative Predictive Value = {}'.format(NPV) + '\n')
+    f.write('Negative Predictive Value = {}\n'.format(NPV))
     print('Positive Likelihood Ratio (TPR/FPR)= {}'.format(PLR))
-    f.write('Positive Likelihood Ratio (TPR/FPR)= {}'.format(PLR) + '\n')
+    f.write('Positive Likelihood Ratio (TPR/FPR)= {}\n'.format(PLR))
     print('Negative Likelihood Ratio (FNR/TNR)= {}'.format(NLR))
-    f.write('Negative Likelihood Ratio (FNR/TNR)= {}'.format(NLR) + '\n')
+    f.write('Negative Likelihood Ratio (FNR/TNR)= {}\n'.format(NLR))
     print('Diagnostic odds Ratio (PLR/NLR)= {}'.format(NLR))
-    f.write('Diagnostic odds Ratio (PLR/NLR)= {}'.format(NLR) + '\n')
+    f.write('Diagnostic odds Ratio (PLR/NLR)= {}\n'.format(NLR))
     print('FMeasure1 = {}'.format(FMeasure1))
-    f.write('FMeasure1 = {}'.format(FMeasure1) + '\n')
+    f.write('FMeasure1 = {}\n'.format(FMeasure1))
     f.close()
 
 # Main
