@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Basic template code to read the binetflow files of the Stratosphere project and try some classifiers
-# Original code proposed by Jorge Dos Santos
-#
+# First code done and shared by Jorge Pessoa dos Santos <J.G.PessoadosSantos@student.tudelft.nl>
 
 import numpy as np
 import pandas as pd
@@ -13,7 +12,16 @@ try:
 except ImportError:
     # For MACOS use cross_validation, since model_selection is not in the repos yet
     from sklearn.cross_validation import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.neural_network import MLPClassifier
+# from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.svm import SVC
+# from sklearn.gaussian_process import GaussianProcessClassifier
+# from sklearn.gaussian_process.kernels import RBF
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+# from sklearn.naive_bayes import GaussianNB
+# from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 import pickle
 import argparse
 import sys
@@ -83,8 +91,10 @@ def split_dataset(dataset):
 
 def train_classifier(X, y):
     print('Training classifier')
-    clf = RandomForestClassifier(n_estimators = 50)
-    clf.fit_transform(X, y)
+    #clf = RandomForestClassifier(n_estimators = 50)
+    clf = KNeighborsClassifier(3)
+    #clf.fit_transform(X, y)
+    clf.fit(X, y)
     print('Done')
     return clf
 
@@ -177,13 +187,13 @@ def compute_total_performance_metrics(TP, TN, FP, FN):
 
     f = open(outputfilename + '.metrics', 'w')
     print('TP = {}'.format(TP))
-    f.write(str(TP) + '\n')
+    f.write('TP = {}'.format(TP) + '\n')
     print('FP = {}'.format(FP))
-    f.write(str(FP) + '\n')
+    f.write('FP = {}'.format(FP) + '\n')
     print('TN = {}'.format(TN))
-    f.write(str(TN) + '\n')
+    f.write('TN = {}'.format(TN) + '\n')
     print('FN = {}'.format(FN))
-    f.write(str(FN) + '\n')
+    f.write('FN = {}'.format(FN) + '\n')
     print('TPR (Recall) = {}'.format(TPR))
     f.write('TPR (Recall) = {}'.format(TPR) + '\n')
     print('TNR = {}'.format(TNR))
