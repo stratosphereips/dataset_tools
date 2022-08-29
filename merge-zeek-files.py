@@ -58,22 +58,27 @@ def print_histogram_amount_file(zeekfile, bin_size):
             while line and line[0] == '#':
                 line = f.readline()
     # Print histogram
-    print(f'Histogram of flows in the zeek file {zeekfile}. Bin size:{bin_size}hs\n')
-    prev_key = False
-    for key in bins_data:
-        hkey = datetime.fromtimestamp(float(key))
-        if not prev_key:
-            prev_key = key
-            prev_hkey = datetime.fromtimestamp(float(prev_key))
-        else:
-            line_size = int(bins_data[prev_key] / max_value * 100)
-            asterics = '*' * line_size
-            print(f'{prev_hkey} - {hkey}: {bins_data[prev_key]} {asterics}')
-            prev_key = key
-            prev_hkey = datetime.fromtimestamp(float(prev_key))
-    final_key = prev_key + bins_step
-    final_hkey = datetime.fromtimestamp(float(final_key))
-    print(f'{prev_hkey} - {final_hkey}: {bins_data[prev_key]} {asterics}')
+    if bins_data:
+        print(f'Histogram of flows in the zeek file {zeekfile}. Bin size:{bin_size}hs\n')
+        prev_key = False
+        for key in bins_data:
+            hkey = datetime.fromtimestamp(float(key))
+            if not prev_key:
+                prev_key = key
+                prev_hkey = datetime.fromtimestamp(float(prev_key))
+            else:
+                line_size = int(bins_data[prev_key] / max_value * 100)
+                asterics = '*' * line_size
+                print(f'{prev_hkey} - {hkey}: {bins_data[prev_key]} {asterics}')
+                prev_key = key
+                prev_hkey = datetime.fromtimestamp(float(prev_key))
+        final_key = prev_key + bins_step
+        final_hkey = datetime.fromtimestamp(float(final_key))
+        line_size = int(bins_data[prev_key] / max_value * 100)
+        asterics = '*' * line_size
+        print(f'{prev_hkey} - {final_hkey}: {bins_data[prev_key]} {asterics}')
+    else:
+        print('The log file did not have any flows')
 
 
 # Main
@@ -87,7 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('-1', '--firstfile', help='Name of the base Zeek file where you want to insert into.', action='store', required=False, type=str)
     parser.add_argument('-2', '--secondfile', help='Name of the Zeek file that you want to be inserted into the base Zeek file.', action='store', required=False, type=str)
     parser.add_argument('-H', '--histogram', help='Do a histogram of amount of flows per bin in this Zeek file.', action='store', required=False, type=str)
-    parser.add_argument('-b', '--histogrambinsize', help='Use this bin size in the histrogram. In number of hours. Defaults to 1.', action='store', required=False, type=int, default=1)
+    parser.add_argument('-b', '--histogrambinsize', help='Use this bin size in the histrogram. In number of hours. Defaults to 1.', action='store', required=False, type=float, default=1)
 
     args = parser.parse_args()
 
