@@ -17,6 +17,7 @@ def print_histogram_amount_file(zeekfile, bin_size):
     if args.debug > 0:
         print(f'[debug] Processing file {zeekfile}, bin={bin_size}')
     bins_data = {}
+    max_value = 0
     # Bins step is in seconds since ts is in seconds
     bins_step = 3600 * bin_size
     with open(zeekfile, 'r') as f:
@@ -41,6 +42,8 @@ def print_histogram_amount_file(zeekfile, bin_size):
                 bins_data[start_of_bin] += 1
                 if args.debug > 0:
                     print(f'\t[+] Add Flow. ts={flow_time}. Start of bin={start_of_bin}. End of bin={end_of_bin}. Data:{bins_data[start_of_bin]}')
+                if bins_data[start_of_bin] > max_value:
+                    max_value = bins_data[start_of_bin]
             elif flow_time > end_of_bin:
                 start_of_bin = end_of_bin
                 end_of_bin = start_of_bin + bins_step
@@ -63,10 +66,14 @@ def print_histogram_amount_file(zeekfile, bin_size):
             prev_key = key
             prev_hkey = datetime.fromtimestamp(float(prev_key))
         else:
-            print(f'{prev_hkey} ::: {hkey}: {bins_data[prev_key]}')
+            line_size = int(bins_data[prev_key] / max_value * 100)
+            asterics = '*' * line_size
+            print(f'{prev_hkey} - {hkey}: {bins_data[prev_key]} {asterics}')
             prev_key = key
             prev_hkey = datetime.fromtimestamp(float(prev_key))
-    print(f'{prev_hkey} ::: {hkey}: {bins_data[prev_key]}')
+    final_key = prev_key + bins_step
+    final_hkey = datetime.fromtimestamp(float(final_key))
+    print(f'{prev_hkey} - {final_hkey}: {bins_data[prev_key]} {asterics}')
 
 
 # Main
