@@ -10,6 +10,7 @@
 import argparse
 from datetime import datetime
 import json
+import math
 
 
 def print_histogram_amount_file(zeekfile, bin_size):
@@ -33,6 +34,7 @@ def print_histogram_amount_file(zeekfile, bin_size):
         while line:
             # Process flows
             try:
+                # Is it a json file?
                 flow_time = float(json.loads(line)['ts'])
             except json.decoder.JSONDecodeError:
                 # It may be a TAB separated file
@@ -46,14 +48,38 @@ def print_histogram_amount_file(zeekfile, bin_size):
                 if not max_value:
                     max_value = 1
                 if args.debug > 0:
-                    print(f'\t[+] Start. ts={flow_time}. Start of bin={start_of_bin}. End of bin={end_of_bin}. Data:{bins_data[start_of_bin]}')
-            elif flow_time <= end_of_bin:
+                    print(f'\t[+] Start and New bin. ts={flow_time}. Start of bin={start_of_bin}. End of bin={end_of_bin}. Data:{bins_data[start_of_bin]}')
+            elif flow_time > start_of_bin and flow_time <= end_of_bin:
                 bins_data[start_of_bin] += 1
                 if args.debug > 0:
                     print(f'\t[+] Add Flow. ts={flow_time}. Start of bin={start_of_bin}. End of bin={end_of_bin}. Data:{bins_data[start_of_bin]}')
                 if bins_data[start_of_bin] > max_value:
                     max_value = bins_data[start_of_bin]
+            elif flow_time < start_of_bin:
+                if args.debug > 2:
+                    print(f'This flow was out of order. Start: {start_of_bin}, End: {end_of_bin}')
+                    print(f'\tFlow: {line}')
+                # Find the bin of this flow
+                found_its_bin = False
+                for key in bins_data.keys():
+                    print(f'ftime {flow_time}. Start: {key}. End:{(key + bins_step)}')
+                    if flow_time > key and flow_time <= (key + bins_step):
+                        # The flow belongs to this bin
+                        if args.debug > 2:
+                            print(f'The out-of-order flow was added to bin with start: {bins_data[key]}')
+                        found_its_bin = True
+                        break
+                    else:
+                        print(f'Not in this bin {key}')
+                if not found_its_bin:
+                    # The flow is from before the fist bin.
+                    difference = start_of_bin - flow_time
+                    steps = difference / bins_step
+                    bins_to_create = math.ceil(steps)
+                    
+
             elif flow_time > end_of_bin:
+                # TODO Create empty bins in the middle
                 start_of_bin = end_of_bin
                 end_of_bin = start_of_bin + bins_step
                 bins_data[start_of_bin] = 1
