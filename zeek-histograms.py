@@ -176,7 +176,7 @@ def print_histogram_amount_file(zeekfile, bin_size):
 # Main
 ####################
 if __name__ == '__main__':  
-    print(f'Zeek logs merger and analyser')
+    print(f'Zeek logs histogram creator')
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', help='Amount of verbosity. This shows more info about the results.', action='store', required=False, type=int, default=1)
     parser.add_argument('-d', '--debug', help='Amount of debugging. This shows more info about inner working.', action='store', required=False, type=int, default=0)
