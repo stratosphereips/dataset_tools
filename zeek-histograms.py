@@ -11,6 +11,7 @@ import argparse
 from datetime import datetime
 import json
 import math
+import time
 
 
 def print_histogram_amount_file(zeekfile, bin_size):
@@ -110,6 +111,7 @@ def print_histogram_amount_file(zeekfile, bin_size):
                             bins_data[new_key] = 0
                         if args.debug > 3:
                             print(f'\t\tNew bin created with key: {new_key}')
+                    bins_data[new_key] = 1
                     # Add the weird flow to the last created bin
                     if args.debug > 3:
                         print(f'\tCurrent bins: {bins_data}')
@@ -152,6 +154,8 @@ def print_histogram_amount_file(zeekfile, bin_size):
     # Print histogram
     if bins_data:
         print(f'Histogram of flows in the zeek file {zeekfile}. Bin size:{bin_size}\n')
+        tz = time.tzname
+        print(f'Current time zone in this system is: {tz[0]}. All flows ')
         prev_key = False
         for key in sorted(bins_data.keys()):
             hkey = datetime.fromtimestamp(float(key))
