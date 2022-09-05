@@ -151,7 +151,7 @@ def print_histogram_amount_file(zeekfile, bin_size):
                 line = f.readline()
     # Print histogram
     if bins_data:
-        print(f'Histogram of flows in the zeek file {zeekfile}. Bin size:{bin_size}hs\n')
+        print(f'Histogram of flows in the zeek file {zeekfile}. Bin size:{bin_size}\n')
         prev_key = False
         for key in sorted(bins_data.keys()):
             hkey = datetime.fromtimestamp(float(key))
