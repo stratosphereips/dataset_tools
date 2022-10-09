@@ -1,4 +1,8 @@
 # Stratosphere Datasets Tools
+[![Docker Image CI](https://github.com/stratosphereips/DatasetsTools/actions/workflows/docker-image.yml/badge.svg)](https://github.com/stratosphereips/DatasetsTools/actions/workflows/docker-image.yml)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/stratosphereips/DatasetsTools/main)
+![Docker Pulls](https://img.shields.io/docker/pulls/stratosphereips/datatoolset?color=green)
+
 A set of tools to work with the [Stratosphere datasets](https://www.stratosphereips.org/datasets-overview).
 
 ## Zeek Histogram Creator
