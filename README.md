@@ -3,7 +3,9 @@
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/stratosphereips/DatasetsTools/main)
 ![Docker Pulls](https://img.shields.io/docker/pulls/stratosphereips/datatoolset?color=green)
 
-A set of tools to work with the [Stratosphere datasets](https://www.stratosphereips.org/datasets-overview).
+A set of tools to work with the [Stratosphere datasets](https://www.stratosphereips.org/datasets-overview):
+* `zeek-histograms.py`: create histograms based on Zeek log files.
+* `merge-zeek-files.py`: merge two Zeek log files.
 
 ## Zeek Histogram Creator
 
@@ -23,4 +25,12 @@ Current time zone in this system is: CET. All flows
 2020-10-06 17:33:06.785668 - 2020-10-06 17:33:16.785668:  7 ********************
 2020-10-06 17:33:16.785668 - 2020-10-06 17:33:26.785668: 35 ****************************************************************************************************
 2020-10-06 17:33:26.785668 - 2020-10-06 17:33:36.785668:  1 **
+```
+
+# Docker Image
+
+Use the public docker image with the latest version and run the tools directly on the container:
+
+```bash
+docker run -v /full/path/to/logs/:/datasetstool/testing-datasets --name stratosphere_datatoolset --rm -it stratosphereips/datatoolset:latest /bin/bash
 ```
