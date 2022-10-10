@@ -31,6 +31,11 @@ Current time zone in this system is: CET. All flows
 
 # Docker Image
 
+To test the `datatoolset` image is working correctly, run the following command. The command will create a new container and run the `zeek-histograms` tool on a Zeek testing dataset: 
+```bash
+docker run --rm -it --name stratosphere_datatoolset stratosphereips/datatoolset:latest python3 zeek-histograms.py -b 10m -f dataset/001-zeek-scenario-malicious/conn.log
+```
+
 Use the public docker image with the latest version and run the tools directly on the container:
 
 ```bash
